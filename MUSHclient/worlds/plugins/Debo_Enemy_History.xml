@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE muclient>
+<muclient>
+   <plugin
+      name="Debo_Historico_Combate"
+      author="Guaxinim"
+      id="c555825a4a5700c35fa80780"
+      language="Lua"
+      purpose="Armazena o histórico de kill do jogador na sessão atual."
+      date_written="2025-01-07"
+      requires="4.73"
+      version="1.0"
+      save_state="y"
+      sequence="-9000"
+   ></plugin>
+
+   <triggers>
+      <trigger
+         enabled="y"
+         name="mob_name"
+         match="^(?!Você|Voce)(?P&lt;dead_enemy&gt;.*) est(?:á|a') mort(?:o|a)!$"
+         regexp="y"
+         script="kill_tracking"
+         sequence="100"
+      ></trigger>
+
+      <trigger
+         enabled="n"
+         name="mob_xp"
+         match="^Você recebe (.*) pontos de experiência pelo combate\.$"
+         regexp="y"
+         script="add_kill_to_history"
+         sequence="100"
+      ></trigger>
+
+      <trigger
+         enabled="n"
+         name="mob_gold"
+         match="^Havia (.*) moedas\.$"
+         regexp="y"
+         script="add_kill_to_history"
+         sequence="100"
+      ></trigger>
+   </triggers>
+
+      <!-- Trigger para limpar o histórico -->
+   <aliases>
+      <alias
+         enabled="y"
+         name="clear_history"
+         match="kill history erase"
+         script="kill_history_erase"
+         sequence="100"
+      ></alias>
+   </aliases>
+   <script>
+<![CDATA[
+require "themed_miniwindows"
+
+-----------------------------------
+-- Tabela de histórico de kills
+-----------------------------------
+
+-- Tabela para armazenar o histórico de kills
+local kill_history = {
+    data = {},  -- A tabela de dados irá armazenar a quantidade de kills
+    display = ""  -- A string de exibição do histórico
+}
+
+-----------------------------------
+-- Funções auxiliares
+-----------------------------------
+
+-- Adiciona um kill ao histórico
+function add_kill_to_history(kill)
+   -- Verifica se o mob já existe no histórico, caso contrário, inicializa
+   if kill_history.data[kill] == nil then
+      kill_history.data[kill] = {count = 0}  -- Inicializa a quantidade de kills (count)
+   end
+
+   -- Incrementa o contador de kills
+   kill_history.data[kill].count = kill_history.data[kill].count + 1
+
+   -- Atualiza a string de exibição
+   update_kill_history_display()
+
+   -- Atualiza a janela
+   win:clear()  -- Limpa a janela antes de adicionar o novo texto
+   win:add_text(kill_history.display)  -- Adiciona o texto do histórico
+end
+
+-- Limpa o histórico de kills
+function kill_history_erase()
+    kill_history.data = {}
+    kill_history.display = "O histórico de kills foi apagado.\nMate algum mob para iniciar o histórico."
+
+    -- Atualiza a janela
+    win:clear()  -- Limpa a janela antes de adicionar o novo texto
+    win:add_text(kill_history.display)  -- Adiciona o texto do histórico
+end
+
+-- Função para atualizar a string de exibição do histórico
+function update_kill_history_display()
+    kill_history.display = ""
+    if next(kill_history.data) ~= nil then  -- Verifica se há kills no histórico
+        sort_by_count()  -- Ordena os dados antes de imprimir
+
+        -- Agora, itera sobre os dados ordenados
+        for _, stats in ipairs(kill_history.sorted_data) do
+            kill_history.display = kill_history.display .. string.format("%s (x%d)\n", stats.kill, stats.count)
+        end
+    else
+        kill_history.display = "Mate algum mob para alimentar o histórico."
+    end
+end
+
+-- Função para ordenar o histórico por quantidade de kills (não por nome)
+function sort_by_count()
+    local sorted = {}
+    for kill, stats in pairs(kill_history.data) do
+        table.insert(sorted, {kill = kill, count = stats.count})
+    end
+    table.sort(sorted, function(a, b) return a.count > b.count end)  -- Ordena por quantidade de kills (count)
+
+    -- Atualiza a tabela original para refletir a ordem
+    kill_history.sorted_data = sorted
+end
+
+-----------------------------------
+-- Função para os triggers
+-----------------------------------
+
+-- Função para os triggers
+last_killed_mob = ""
+
+function kill_tracking(name, line, wildcards)
+    -- print("kill_tracking")
+    -- Atualiza a expressão regular para capturar o nome do mob de forma mais genérica
+    last_killed_mob = string.match(line, "(.+) está")  -- Captura tudo após o primeiro "nome" até "está"
+    
+    if last_killed_mob then
+        -- print("Mob morto: " .. last_killed_mob)
+        add_kill_to_history(last_killed_mob)  -- Passa o nome do mob para a função de adicionar ao histórico
+    else
+        print("Não foi possível capturar o nome do mob")
+        return
+    end
+end
+
+-----------------------------------
+-- Janela
+-----------------------------------
+
+-- Criando a janela do histórico de kills
+win = ThemedTextWindow("kill_history_window", 200, 200, 250, 200, "Historico de Kills", "center", false, true, true)
+win:add_text("Mate algum mob para iniciar o histórico.")
+
+]]>
+</script>
+</muclient>

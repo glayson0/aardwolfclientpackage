@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE muclient>
-<!-- Saved on Monday, December 27, 2010, 4:06 AM -->
-<!-- MuClient version 4.71 -->
+<!-- MuClient version 5.07-pre -->
 <!-- Written by Nick Gammon -->
 <!-- Home Page: http://www.mushclient.com/ -->
 
-<!-- Plugin state saved. Plugin: "Aardwolf_Main_Layout". World: "Aardwolf". -->
+<!-- Plugin state saved. Plugin: "Aardwolf_Main_Layout". World: "DeboTeste". -->
 
 <muclient>
 
 <!-- variables -->
 
 <variables
-   muclient_version="4.71"
+   muclient_version="5.07-pre"
    world_file_version="15"
-   date_saved="2010-12-27 04:06:08"
   >
   <variable name="defaulttr">0</variable>
   <variable name="enabled">true</variable>
-  <variable name="trbottom">544</variable>
-  <variable name="trleft">7</variable>
-  <variable name="trright">650</variable>
-  <variable name="trtop">140</variable>
+  <variable name="hide_main_scroll">true</variable>
+  <variable name="scrollbar_hidden_once">true</variable>
+  <variable name="trbottom">842</variable>
+  <variable name="trleft">529</variable>
+  <variable name="trright">1378</variable>
+  <variable name="trtop">219</variable>
 </variables>
 </muclient>

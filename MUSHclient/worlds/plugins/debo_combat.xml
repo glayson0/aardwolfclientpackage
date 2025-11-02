@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE muclient>
+<muclient>
+    <plugin
+        name="debo_combat"
+        author="Guaximim"
+        id="bb77947c6c7922e57fb02992"
+        language="Lua"
+        purpose="Sistema de combate modular integrado com DeboCore."
+        date_written="2025-11-01 12:00:00"
+        requires="4.73"
+        version="2.0"
+        save_state="y"
+    >
+    </plugin>
+
+    <triggers>
+        <!-- Prompt principal para detecção de combate -->
+        <trigger
+            name="Prompt"
+            enabled="y"
+            match="^&lt;.*%?.*&gt;$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="1"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Fight prompt com nome do inimigo -->
+        <trigger
+            name="Fight_Prompt"
+            enabled="y"
+            match="{[-&lt;&gt;]*} (?P&lt;enemy&gt;.*)    .*{[-&lt;&gt;]*}"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- === TRIGGERS DE FIM DE COMBATE === -->
+        
+        <!-- Combate finalizado: Mob morto -->
+        <trigger
+            name="Inimigo_Morreu"
+            enabled="y"
+            match="^(?!Você|Voce).* est(?:á|a') mort(?:o|a)!$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Combate finalizado: Mob fugiu -->
+        <trigger
+            name="Inimigo_Fugiu"
+            enabled="y"
+            match="^.* vai para .*\.$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Combate finalizado: Jogador morreu -->
+        <trigger
+            name="Jogador_Morreu"
+            enabled="y"
+            match="^Você está morto!$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Combate finalizado: Jogador fugiu -->
+        <trigger
+            name="Jogador_Fugiu"
+            enabled="y"
+            match="^Você consegue fugir para o .*\.$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- === TRIGGERS DE ATAQUE === -->
+        
+        <!-- Errou o ataque -->
+        <trigger
+            name="TYPE_MISS"
+            enabled="y"
+            match="((^Você|.+ você) (desvia|(.+enquanto )?erra|.+ errando|tenta (.+mas erra|.+sem sucesso|.+escapa|.+desvia))|.+ desvia(ndo|) (de s(eu|ua)|.+ tenta)).*[.!]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Levou dano -->
+        <trigger
+            name="TYPE_HURT"
+            enabled="y"
+            match=".*[.!] \[-\d+\]$"
+            match_text_colour="y"
+            text_colour="9"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Golpe -->
+        <trigger
+            name="TYPE_HIT"
+            enabled="y"
+            match="^Você (?:.*)(golpeia|golpe)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Murro -->
+        <trigger
+            name="TYPE_PUNCH"
+            enabled="y"
+            match="^Você (?:.*)(murro|esmurra)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Pancada -->
+        <trigger
+            name="TYPE_THRASH"
+            enabled="y"
+            match="^Você (?:.*)(pancada|espancar)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Esmagada -->
+        <trigger
+            name="TYPE_POUND"
+            enabled="y"
+            match="^Você (?:.*)(esmaga|esmagada)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Corte -->
+        <trigger
+            name="TYPE_SLASH"
+            enabled="y"
+            match="^Você (?:.*)(corte|corta)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Cacetada -->
+        <trigger
+            name="TYPE_BLUDGEON"
+            enabled="y"
+            match="^Você (?:.*)(caceteia)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Punhalada -->
+        <trigger
+            name="TYPE_STAB"
+            enabled="y"
+            match="^Você (?:.*)(punhalada|apunhala)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+        
+        <!-- Defesa com arma -->
+        <trigger
+            name="TYPE_PARRY"
+            enabled="y"
+            match="^Você se defende do ataque de .*$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+        
+        <!-- Defesa com escudo -->
+        <trigger
+            name="TYPE_SHIELD"
+            enabled="y"
+            match="^Você usa seu escudo para bloquear o ataque de .*"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <!-- Ataques adicionais -->
+        <trigger
+            name="TYPE_BITE"
+            enabled="y"
+            match="^Você (?:.*)(morde|mordida)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <trigger
+            name="TYPE_CLAW"
+            enabled="y"
+            match="^Você (?:.*)(arranha|arranhar)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+        <trigger
+            name="TYPE_CRUSH"
+            enabled="y"
+            match="^Você (?:.*)(tritura|triturar)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="debo_trigger_handler"
+        ></trigger>
+
+    </triggers>
+
+    <aliases>
+        <!-- Comandos do sistema modular -->
+        <alias
+            enabled="y"
+            name="combat_status"
+            match="combat status"
+            script="debo_command_handler"
+            sequence="100"
+        ></alias>
+
+        <alias
+            enabled="y"
+            name="combat_debug"
+            match="combat debug"
+            script="debo_command_handler"
+            sequence="100"
+        ></alias>
+
+        <alias
+            enabled="y"
+            name="combat_reset"
+            match="combat reset"
+            script="debo_command_handler"
+            sequence="100"
+        ></alias>
+
+        <alias
+            enabled="y"
+            name="combat_stop"
+            match="combat stop"
+            script="debo_command_handler"
+            sequence="100"
+        ></alias>
+
+        <alias
+            enabled="y"
+            name="combat_test"
+            match="combat test"
+            script="debo_command_handler"
+            sequence="100"
+        ></alias>
+
+        <!-- Comando legado de parar música -->
+        <alias
+            enabled="y"
+            name="stop_combat_music"
+            match="scm"
+            script="debo_command_handler"
+            sequence="100"
+        ></alias>
+
+        <!-- Configurações de música -->
+        <alias
+            enabled="y"
+            match="music off"
+            send_to="12"
+            sequence="100"
+        >
+            <send>
+                debo_music_toggle(false)
+            </send>
+        </alias>
+
+        <alias
+            enabled="y"
+            match="music on"
+            send_to="12"
+            sequence="100"
+        >
+            <send>
+                debo_music_toggle(true)
+            </send>
+        </alias>
+
+        <!-- Comando de ajuda -->
+        <alias
+            enabled="y"
+            name="combat_help"
+            match="combat help"
+            script="debo_show_help"
+            sequence="100"
+        ></alias>
+
+    </aliases>
+
+    <script>
+<![CDATA[
+    -- Importar módulos necessários
+    require "wait"
+    
+    -- Carregar sistema modular
+    dofile("debo_core.lua")
+    dofile("debo_combat.lua")
+    
+    -- Variáveis globais
+    local DeboCore = require("debo_core")
+    local Combat = require("debo_combat")
+    
+    -- Inicialização do plugin
+    function OnPluginInstall()
+        ColourNote("green", "black", "=== Plugin de Combate Modular v2.0 ===")
+        
+        -- Inicializar core e módulo de combate
+        DeboCore.Initialize()
+        Combat.Initialize()
+        
+        -- Configurar variáveis padrão se não existirem
+        if GetVariable("music") == "" then
+            SetVariable("music", "on")
+        end
+        
+        if GetVariable("debug") == "" then
+            SetVariable("debug", "off")
+        end
+        
+        -- Registrar event handlers adicionais para demonstração
+        DeboCore.RegisterEventHandler("player_took_damage", function(damage)
+            if damage > 30 then
+                ColourNote("red", "black", "?? DANO ALTO: " .. damage .. " pontos!")
+            end
+        end)
+        
+        DeboCore.RegisterEventHandler("player_attribute_changed", function(attr, new_val, old_val)
+            if attr == "health" and new_val < old_val then
+                local damage = old_val - new_val
+                DeboCore.TriggerEvent("player_took_damage", damage)
+            end
+        end)
+        
+        ColourNote("cyan", "black", "? Sistema carregado com sucesso!")
+        ColourNote("white", "black", "Digite 'combat help' para ver comandos disponíveis")
+        
+        DeboCore.Info("PLUGIN", "Plugin de combate modular carregado")
+    end
+    
+    -- Handler principal para triggers
+    function debo_trigger_handler(trigger_name, line, wildcards, styles)
+        Combat.ProcessTrigger(trigger_name, line, wildcards)
+    end
+    
+    -- Handler para comandos
+    function debo_command_handler(alias_name, line, wildcards)
+        local commands = Combat.Commands()
+        local command_func = commands[line]
+        
+        if command_func then
+            command_func()
+        elseif line == "scm" then
+            -- Comando legado
+            Combat.StopCombat()
+        else
+            DeboCore.Warn("PLUGIN", "Comando desconhecido: " .. line)
+        end
+    end
+    
+    -- Função para alternar música
+    function debo_music_toggle(enabled)
+        DeboCore.Settings.music_enabled = enabled
+        DeboCore.SaveSettings()
+        
+        local status = enabled and "ativada" or "desativada"
+        ColourNote("yellow", "black", "? Música " .. status)
+        
+        -- Se desabilitou música e está em combate, para a música
+        if not enabled and DeboCore.Player.is_fighting then
+            Combat.StopBattleMusic()
+        end
+    end
+    
+    -- Função de ajuda
+    function debo_show_help()
+        ColourNote("cyan", "black", "=== COMANDOS DE COMBATE MODULAR ===")
+        ColourNote("white", "black", "")
+        ColourNote("yellow", "black", "?? Status e Informações:")
+        ColourNote("white", "black", "  combat status  - Mostra status detalhado do combate")
+        ColourNote("white", "black", "  combat debug   - Liga/desliga mensagens de debug")
+        ColourNote("white", "black", "  combat test    - Testa reprodução de som de ataque")
+        ColourNote("white", "black", "")
+        ColourNote("yellow", "black", "??? Controles:")
+        ColourNote("white", "black", "  combat stop    - Para o combate manualmente")
+        ColourNote("white", "black", "  combat reset   - Reseta estatísticas de dano")
+        ColourNote("white", "black", "  scm            - Para música de combate (legado)")
+        ColourNote("white", "black", "")
+        ColourNote("yellow", "black", "?? Música:")
+        ColourNote("white", "black", "  music on       - Ativa música de combate")
+        ColourNote("white", "black", "  music off      - Desativa música de combate")
+        ColourNote("white", "black", "")
+        ColourNote("yellow", "black", "?? Sistema:")
+        ColourNote("white", "black", "  combat help    - Mostra esta ajuda")
+        ColourNote("green", "black", "")
+        ColourNote("green", "black", "? Recursos automáticos:")
+        ColourNote("green", "black", "  ? Detecção automática de combate")
+        ColourNote("green", "black", "  ? Rastreamento de dano causado/recebido")
+        ColourNote("green", "black", "  ? Sons de ataque personalizados")
+        ColourNote("green", "black", "  ? Música de combate com fade in/out")
+        ColourNote("green", "black", "  ? Duração de combate e estatísticas")
+    end
+    
+    -- Funções de compatibilidade com sistema antigo
+    function combat_handler(event_name, line, wildcards)
+        debo_trigger_handler(event_name, line, wildcards)
+    end
+    
+    function attack_handler(event_name)
+        debo_trigger_handler(event_name, "", {})
+    end
+    
+    function stop_combat()
+        Combat.StopCombat()
+    end
+    
+    -- Função de compatibilidade para música
+    function battle_music()
+        if DeboCore.Player.is_fighting then
+            Combat.StartBattleMusic()
+        else
+            Combat.StopBattleMusic()
+        end
+    end
+    
+    -- Hook para quando plugin é desinstalado
+    function OnPluginClose()
+        DeboCore.Info("PLUGIN", "Plugin de combate modular sendo descarregado")
+    end
+]]>
+    </script>
+</muclient>

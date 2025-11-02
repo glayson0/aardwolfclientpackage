@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE muclient>
-<!-- MuClient version 5.05 -->
+<!-- MuClient version 5.07-pre -->
 <!-- Written by Nick Gammon -->
 <!-- Home Page: http://www.mushclient.com/ -->
 <muclient>
 <world
-   muclient_version="5.05"
+   muclient_version="5.07-pre"
    world_file_version="15"
 
    auto_say_override_prefix="-"
@@ -15,14 +15,17 @@
    id="e0eb198d8d5698e3b2f61483"
    input_font_name="Courier New"
    mapping_failure="Alas, you cannot go that way."
-   name="Aardwolf"
+   name="DeboTeste"
    new_activity_sound="(No sound)"
    output_font_name="Courier New"
+   password_base64="y"
+   password="YQ=="
+   player="sakura"
    script_editor="notepad"
    script_editor_argument="%file"
    script_language="Lua"
    script_prefix="\\\"
-   site="aardmud.org"
+   site="localhost"
    spam_message="look"
    speed_walk_prefix="#"
    terminal_identification="MUSHclient-Aard"
@@ -38,6 +41,7 @@
    chat_port="4050"
    confirm_on_paste="y"
    confirm_on_send="y"
+   connect_method="2"
    default_trigger_sequence="100"
    default_alias_sequence="100"
    detect_pueblo="y"
@@ -52,6 +56,8 @@
    enable_timers="y"
    enable_triggers="y"
    enable_trigger_sounds="y"
+   fade_output_opacity_percent="20"
+   fade_output_seconds="8"
    history_lines="1000"
    hyperlink_adds_to_command_history="y"
    hyperlink_colour="#0080FF"
@@ -73,7 +79,7 @@
    output_font_charset="1"
    paste_delay_per_lines="1"
    pixel_offset="1"
-   port="23"
+   port="4000"
    proxy_port="1080"
    save_deleted_command="y"
    save_world_automatically="y"
@@ -96,10 +102,9 @@
    underline_hyperlinks="y"
    unpause_on_send="y"
    use_custom_link_colour="y"
-   utf_8="y"
    warn_if_scripting_inactive="y"
    wrap="y"
-   wrap_column="239"
+   wrap_column="106"
    write_world_name_to_log="y"
    > <!-- end of general world attributes -->
 
@@ -108,24 +113,27 @@
 <!-- triggers -->
 
 <triggers
-   muclient_version="5.05"
+   muclient_version="5.07-pre"
    world_file_version="15"
   >
 </triggers>
 
 <!-- aliases -->
 
-<aliases>
-<alias
-  match="^#alias +{(.*?)} +{(.*?)}( +{(.*?)})?$"
-  enabled="y"
-  group="special_convenience_aliases"
-  regexp="y"
-  send_to="12"
-  ignore_case="y"
-  sequence="100"
->
-<send>require "addxml"
+<aliases
+   muclient_version="5.07-pre"
+   world_file_version="15"
+  >
+  <alias
+   match="^#alias +{(.*?)} +{(.*?)}( +{(.*?)})?$"
+   enabled="y"
+   group="special_convenience_aliases"
+   regexp="y"
+   send_to="12"
+   ignore_case="y"
+   sequence="100"
+  >
+  <send>require "addxml"
 
 addxml.alias {
   name = "command_line_alias_"..string.gsub(Base64Encode("%1"), "=", ""),
@@ -139,18 +147,17 @@ addxml.alias {
 
 ColourNote("white", "green", "Added alias "..(("%4" ~= "") and "to group '%4' " or "").."to match on '%1' and send '%2'")
 </send>
-</alias>
-
-<alias
-  match="^#trigger +{(.*?)} +{(.*?)}( +{(.*?)})?$"
-  enabled="y"
-  group="special_convenience_aliases"
-  regexp="y"
-  send_to="12"
-  ignore_case="y"
-  sequence="100"
->
-<send>require "addxml"
+  </alias>
+  <alias
+   match="^#trigger +{(.*?)} +{(.*?)}( +{(.*?)})?$"
+   enabled="y"
+   group="special_convenience_aliases"
+   regexp="y"
+   send_to="12"
+   ignore_case="y"
+   sequence="100"
+  >
+  <send>require "addxml"
 
 addxml.trigger {
   name = "command_line_trigger_"..string.gsub(Base64Encode("%1"), "=", ""),
@@ -164,14 +171,13 @@ addxml.trigger {
 
 ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' " or "").."to match on '%1' and send '%2'")
 </send>
-</alias>
+  </alias>
 </aliases>
-
 
 <!-- timers -->
 
 <timers
-   muclient_version="5.05"
+   muclient_version="5.07-pre"
    world_file_version="15"
   >
 </timers>
@@ -179,7 +185,7 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
 <!-- macros -->
 
 <macros
-   muclient_version="5.05"
+   muclient_version="5.07-pre"
    world_file_version="15"
   >
 
@@ -272,7 +278,7 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
 <!-- variables -->
 
 <variables
-   muclient_version="5.05"
+   muclient_version="5.07-pre"
    world_file_version="15"
   >
 </variables>
@@ -280,7 +286,7 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
 <!-- colours -->
 
 <colours
-   muclient_version="5.05"
+   muclient_version="5.07-pre"
    world_file_version="15"
   >
 
@@ -304,8 +310,8 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
    <colour seq="3" rgb="lime" />
    <colour seq="4" rgb="yellow" />
    <colour seq="5" rgb="blue" />
-   <colour seq="6" rgb="magenta" />
-   <colour seq="7" rgb="cyan" />
+   <colour seq="6" rgb="fuchsia" />
+   <colour seq="7" rgb="aqua" />
    <colour seq="8" rgb="white" />
 
  </bold>
@@ -321,7 +327,7 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
   <colour seq="6" name="Custom6" text="#FF80C0" back="black" />
   <colour seq="7" name="Custom7" text="red" back="black" />
   <colour seq="8" name="Custom8" text="#0080C0" back="black" />
-  <colour seq="9" name="Custom9" text="magenta" back="black" />
+  <colour seq="9" name="Custom9" text="fuchsia" back="black" />
   <colour seq="10" name="Custom10" text="#804040" back="black" />
   <colour seq="11" name="Custom11" text="#FF8040" back="black" />
   <colour seq="12" name="Custom12" text="teal" back="black" />
@@ -336,12 +342,12 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
 <!-- keypad -->
 
 <keypad
-   muclient_version="5.05"
+   muclient_version="5.07-pre"
    world_file_version="15"
   >
 
   <key name="0" >
-  <send>scan</send>
+  <send>look</send>
   </key>
 
   <key name="1" >
@@ -359,7 +365,7 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
   </key>
 
   <key name="5" >
-  <send>look</send>
+  <send>who</send>
   </key>
 
   <key name="6" >
@@ -445,7 +451,7 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
 <!-- printing -->
 
 <printing
-   muclient_version="5.05"
+   muclient_version="5.07-pre"
    world_file_version="15"
   >
 
@@ -471,22 +477,35 @@ ColourNote("white", "green", "Added trigger "..(("%4" ~= "") and "to group '%4' 
 </printing>
 
 <!-- plugins -->
-<include name="aard_requirements.xml" plugin="y" />
 <include name="aard_text_substitution.xml" plugin="y" />
 <include name="aard_prompt_fixer.xml" plugin="y" />
+<include name="aard_keyboard_lockout.xml" plugin="y" />
+<include name="aard_ingame_help_window.xml" plugin="y" />
+<include name="aard_channels_fiendish.xml" plugin="y" />
 <include name="aard_chat_echo.xml" plugin="y" />
-<include name="aard_VI_command_output.xml" plugin="y" />
-<include name="aard_vi_review_buffers.xml" plugin="y" />
+<include name="aard_requirements.xml" plugin="y" />
 <include name="aard_soundpack.xml" plugin="y" />
 <include name="aard_GMCP_handler.xml" plugin="y" />
 <include name="aard_miniwindow_z_order_monitor.xml" plugin="y" />
+<include name="aard_layout.xml" plugin="y" />
+<include name="aard_statmon_gmcp.xml" plugin="y" />
+<include name="aard_group_monitor_gmcp.xml" plugin="y" />
+<include name="aard_health_bars_gmcp.xml" plugin="y" />
 <include name="aard_Copy_Colour_Codes.xml" plugin="y" />
+<include name="aard_ASCII_map.xml" plugin="y" />
+<include name="Aardwolf_Bigmap_Graphical.xml" plugin="y" />
 <include name="aard_repaint_buffer.xml" plugin="y" />
-<include name="Hyperlink_URL2.xml" plugin="y" />
+<include name="aard_new_connection.xml" plugin="y" />
+<include name="aard_inventory_serials.xml" plugin="y" />
 <include name="aard_GMCP_mapper.xml" plugin="y" />
 <include name="aard_package_update_checker.xml" plugin="y" />
-<include name="universal_text_to_speech.xml" plugin="y" />
-<include name="aard_new_connection.xml" plugin="y" />
 <include name="aard_help.xml" plugin="y" />
 <include name="aard_vital_shortcuts.xml" plugin="y" />
+<include name="aard_Theme_Controller.xml" plugin="y" />
+<include name="Automatic_Backup.xml" plugin="y" />
+<include name="Debo_Soundpack.xml" plugin="y" />
+<include name="Play_Random_Sound.xml" plugin="y" />
+<include name="debo_combat.xml" plugin="y" />
+<include name="Hyperlink_URL2.xml" plugin="y" />
+<include name="aard_splitscreen_scrollback.xml" plugin="y" />
 </muclient>

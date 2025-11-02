@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE muclient>
+<muclient>
+    <plugin
+        name="Debo_Combate"
+        author="Guaximim"
+        id="aa55825a4a5700c35fa80780"
+        language="Lua"
+        purpose="Monitor de combate."
+        date_written="2025-01-06 23:06:43"
+        requires="4.73"
+        version="1.0"
+        save_state="y"
+    >
+    </plugin>
+
+    <triggers>
+
+        <trigger
+            name="Prompt"
+            enabled="y"
+            match="^&lt;.*%?.*&gt;$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="1"
+            script="combat_handler"
+        ></trigger>
+
+        <trigger
+            name="Fight_Prompt"
+            enabled="y"
+            match="{[-&lt;&gt;]*} (?P&lt;enemy&gt;.*)    .*{[-&lt;&gt;]*}"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="combat_handler"
+        ></trigger>
+
+        <!-- Combate finalizado: Mob morto -->
+        <trigger
+            name="Inimigo_Morreu"
+            enabled="y"
+            match="^(?!Você|Voce).* est(?:á|a') mort(?:o|a)!$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="combat_handler"
+        ></trigger>
+
+        <!-- Combate finalizado: Mob fugiu -->
+        <trigger
+            name="Inimigo_Fugiu"
+            enabled="y"
+            match="^.* vai para .*\.$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="combat_handler"
+        ></trigger>
+
+        <!-- Combate finalizado: Jogador morreu -->
+        <trigger
+            name="Jogador_Morreu"
+            enabled="y"
+            match="^Você está morto!$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="combat_handler"
+        ></trigger>
+
+        <!-- Combate finalizado: Jogador fugiu -->
+        <trigger
+            name="Jogador_Fugiu"
+            enabled="y"
+            match="^Você consegue fugir para o .*\.$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="combat_handler"
+        >
+        </trigger>
+
+        <!-- Errou o ataque -->
+        <trigger
+            name="TYPE_MISS"
+            enabled="y"
+            match="((^Você|.+ você) (desvia|(.+enquanto )?erra|.+ errando|tenta (.+mas erra|.+sem sucesso|.+escapa|.+desvia))|.+ desvia(ndo|) (de s(eu|ua)|.+ tenta)).*[.!]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        >
+        </trigger>
+
+        <!-- Levou dano -->
+        <trigger
+            name="TYPE_HURT"
+            enabled="y"
+            match=".*[.!] \[-\d+\]$"
+            match_text_colour="y"
+            text_colour="9"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+
+        <!-- Trigger para TYPE_HIT -->
+        <trigger
+            name="TYPE_HIT"
+            enabled="y"
+            match="^Você (?:.*)(golpeia|golpe)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+
+        <!-- Trigger para TYPE_PUNCH -->
+        <trigger
+            name="TYPE_PUNCH"
+            enabled="y"
+            match="^Você (?:.*)(murro|esmurra)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+
+        <!-- Trigger para TYPE_THRASH -->
+        <trigger
+            name="TYPE_THRASH"
+            enabled="y"
+            match="^Você (?:.*)(pancada|espancar)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+
+        <!-- Trigger para TYPE_POUND -->
+        <trigger
+            name="TYPE_POUND"
+            enabled="y"
+            match="^Você (?:.*)(esmaga|esmagada)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+
+        <!-- Trigger para TYPE_SLASH -->
+        <trigger
+            name="TYPE_SLASH"
+            enabled="y"
+            match="^Você (?:.*)(corte|corta)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+
+        <trigger
+            name="TYPE_BLUDGEON"
+            enabled="y"
+            match="^Você (?:.*)(caceteia)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+
+        <!-- Trigger para TYPE_STAB -->
+        <trigger
+            name="TYPE_STAB"
+            enabled="y"
+            match="^Você (?:.*)(punhalada|apunhala)(?:.*)(?:\.*|!*) \[\d+\]$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+        
+        <trigger
+            name="TYPE_PARRY"
+            enabled="y"
+            match="^Você se defende do ataque de .*$"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+        
+        <trigger
+            name="TYPE_SHIELD"
+            enabled="y"
+            match="^Você usa seu escudo para bloquear o ataque de .*"
+            match_text_colour="n"
+            regexp="y"
+            sequence="100"
+            script="attack_handler"
+        ></trigger>
+
+    </triggers>
+
+    <aliases>
+        <alias
+            enabled="y"
+            name="Stop_music"
+            match="scm"
+            script="stop_combat"
+            sequence="100"
+        >
+        </alias>
+
+        <alias
+            enabled="y"
+            match="music off"
+            send_to="12"
+            sequence="100"
+        >
+            <send>
+                SetVariable("music", "off")
+                ColourNote("yellow", "black", "Música desativada")
+            </send>
+        </alias>
+
+        <alias
+            enabled="y"
+            match="music on"
+            send_to="12"
+            sequence="100"
+        >
+            <send>
+                SetVariable("music", "on")
+                ColourNote("yellow", "black", "Música ativada")
+            </send>
+        </alias>
+
+    </aliases>
+
+    <script>
+<![CDATA[
+    require "sound_utils"
+    require "wait"
+
+    -------------------------
+    -- Variáveis
+    -------------------------
+    fighting = false  -- Estado de combate
+    SetVariable("current_enemy", "")
+    COMBAT_PATH = "DeboSounds/SFX/Combate/"
+
+    -------------------------
+    -- Funções
+    -------------------------
+    local combat_events = {
+        Prompt = function(line)
+            -- print("[Debo_Combat] Prompt")
+            if string.match(line, "^&lt;.*%%.*&gt;$") then  -- Escapa o caractere '%' com '%%'
+                if fighting then
+                    -- print("[Debo_Combat] Combate em andamento")
+                    return
+                end
+                -- print("[Debo_Combat] Iniciando combate")
+                fighting = true
+                battle_music()
+            else
+                -- print("[Debo_Combat] Não está em combate")
+                if fighting or GetSoundStatus(9) > 0 then
+                    stop_combat()
+                end
+            end
+        end,
+
+        Fight_Prompt = function(wildcards)
+            -- print("[Debo_Combat] FightPrompt")
+            if fighting then
+                -- print("[Debo_Combat] Combate em andamento")
+                return
+            end
+            -- print("[Debo_Combat] Iniciando combate")
+            fighting = true
+            battle_music()
+        end,
+
+        Inimigo_Morreu = function()
+            if fighting then
+                -- print("[Debo_Combat] Inimigo morreu")
+                stop_combat()
+            end
+        end,
+
+        Inimigo_Fugiu = function(line, wildcards)
+            if fighting then
+                -- print("[Debo_Combat] Inimigo fugiu")
+                stop_combat()
+            end
+        end,
+
+        Jogador_Morreu = function()
+            -- print("[Debo_Combat] Jogador morreu")
+            stop_combat()
+        end,
+
+        Jogador_Fugiu = function(line)
+            -- print("[Debo_Combat] Jogador fugiu")
+            stop_combat()
+        end
+    }
+
+    function combat_handler(event_name, line, wildcards)
+        if combat_events[event_name]then
+            combat_events[event_name](line, wildcards)
+        end
+    end
+
+    function stop_combat()
+        -- print("[Debo_Combat] Parando combate.")
+        if fighting then
+            fighting = false
+            current_enemy = ""
+        end
+        battle_music()
+    end
+
+    -------------------------
+    -- Sons de ataque
+    -------------------------
+
+    -- Tabela com tipos de ataque e pasta de sons associadas
+    local attack_types = {
+        ["TYPE_BITE"] = "Bite",         -- "mordida", "morder", "morde"
+        ["TYPE_BLAST"] = "Blast",       -- "explosão", "explodir", "explode"
+        ["TYPE_BLUDGEON"] = "Bludgeon", -- "cacetada", "cacetar", "caceteia"
+        ["TYPE_CLAW"] = "Claw",         -- "arranhada", "arranhar", "arranha"
+        ["TYPE_CRUSH"] = "Crush",       -- "triturada", "triturar", "tritura"
+        ["TYPE_HIT"] = "Hit",           -- "golpe", "golpear", "golpeia"
+        ["TYPE_HURT"] = "Hurt",          -- Sons de dano
+        ["TYPE_MAUL"] = "Maul",         -- "marretada", "marretar", "marreta"
+        ["TYPE_MISS"] = "Miss",         -- Sons de erro/desviar
+        ["TYPE_PARRY"] = "Parry",       -- Sons de parry
+        ["TYPE_PIERCE"] = "Pierce",     -- "perfuração", "perfurar", "perfura"
+        ["TYPE_POUND"] = "Pound",       -- "esmagada", "esmagar", "esmaga"
+        ["TYPE_PUNCH"] = "Punch",       -- "murro", "esmurrar", "esmurra"
+        ["TYPE_SLASH"] = "Slash",       -- "corte", "cortar", "corta"
+        ["TYPE_SHIELD"] = "Shield",     -- bloquear com escudo
+        ["TYPE_STAB"] = "Stab",         -- "punhalada", "apunhalar", "apunhala"
+        ["TYPE_STING"] = "Sting",       -- "ferroada", "ferroar", "ferroa"
+        ["TYPE_THRASH"] = "Thrash",     -- "pancada", "espancar", "espanca"
+        ["TYPE_WHIP"] = "Whip"         -- "chicotada", "chicotear", "chicoteia"
+    }
+
+    function attack_handler(event_name)
+        -- Verifica se o evento está na tabela
+        local sound_type = attack_types[event_name]
+        if sound_type then
+            -- Constrói o caminho do som
+            local args = string.format("0,%s%s,n,0", COMBAT_PATH, sound_type)
+            -- Toca o som aleatório
+            local result = CallPlugin("461479af5d149307e69e305f", "PlayRandomSound", args)
+            if result ~= 0 then
+                -- print("Erro ao reproduzir som para: " .. event_name)
+            end
+        else
+            -- Evento não configurado
+            -- print("Evento desconhecido: " .. event_name)
+        end
+    end
+
+    -------------------------
+    -- Música de Combate
+    -------------------------
+
+    current_combat_volume = -40  -- Volume inicial
+    fade_speed = 5  -- Velocidade de ajuste de volume (maior = mais rápido)
+    fading_out = false
+
+    function battle_music()
+        if GetVariable("music") == "off" then
+            return
+        end
+
+        if fighting then
+            -- Iniciar música de combate se não estiver tocando
+            if GetSoundStatus(9) < 0 then
+                -- print("Música iniciando...")
+                PlaySound(9, "battle.wav", true, current_combat_volume)
+                local a = FadeIn(9)
+                wait.make(function()
+                    wait.time(5)
+                    
+                end)
+            end
+        else
+            -- Fazer fade out
+            if GetSoundStatus(9) > 0 then
+                -- print("Música parando...")
+                StopSound(9)
+                wait.make(function()
+                    wait.time(5)
+                    
+                end)
+            end
+        end
+    end
+]]>
+    </script>
+</muclient>
