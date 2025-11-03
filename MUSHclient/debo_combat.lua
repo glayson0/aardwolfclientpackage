@@ -2,7 +2,7 @@
 -- Módulo de combate modular para MUSHclient
 
 local DeboCore = require("debo_core")
--- local SoundUtils = require("sound_utils")
+local SoundUtils = require("sound_utils")
 
 local Combat = {}
 Combat.__index = Combat
@@ -11,6 +11,7 @@ Combat.VERSION = "1.0.0"
 -- Configurações específicas do combate
 Combat.Settings = {
     sound_path = "sounds/SFX/Combate/",
+    music_path = "BGS/battle.wav",
     music_channel = 9,
     combat_volume = -40,
     fade_speed = 5
@@ -50,6 +51,13 @@ Combat.AttackTypes = {
 -- Inicialização do módulo
 function Combat.Initialize()
     DeboCore.Info("COMBAT", "Módulo de Combate v" .. Combat.VERSION .. " inicializado")
+
+    -- Inicializar SoundUtils
+    SoundUtils.Initialize()
+    
+    -- Configurar volumes para combate
+    SoundUtils.SetVolumeRange(-40, 0)
+    SoundUtils.SetFadeSettings(2.0, 30)  -- Fade mais longo e suave para combate
 
     -- Registrar event handlers no core
     DeboCore.RegisterEventHandler("combat_start", Combat.OnCombatStart)
@@ -187,21 +195,33 @@ function Combat.StartBattleMusic()
     end
 
     DeboCore.Debug("COMBAT", "Iniciando música de combate")
+    DeboCore.Debug("COMBAT", "Arquivo de música: " .. Combat.Settings.music_path)
+    DeboCore.Debug("COMBAT", "Canal: " .. Combat.Settings.music_channel)
 
     if PlaySound then
-        PlaySound(Combat.Settings.music_channel, "battle.wav", true, Combat.Settings.combat_volume)
-        if FadeIn then
-            FadeIn(Combat.Settings.music_channel)
+        -- Iniciar música no volume mínimo
+        local result = PlaySound(Combat.Settings.music_channel, Combat.Settings.music_path, true, -40)
+        DeboCore.Debug("COMBAT", "PlaySound resultado: " .. tostring(result))
+        
+        -- Verificar se conseguiu iniciar
+        if GetSoundStatus then
+            local status = GetSoundStatus(Combat.Settings.music_channel)
+            DeboCore.Debug("COMBAT", "Status após PlaySound: " .. status)
         end
+        
+        -- Fazer fade in suave usando SoundUtils
+        SoundUtils.FadeIn(Combat.Settings.music_channel, -40, Combat.Settings.combat_volume, 3.0, 40)
+    else
+        DeboCore.Warn("COMBAT", "PlaySound não está disponível")
     end
 end
 
 function Combat.StopBattleMusic()
     if GetSoundStatus and GetSoundStatus(Combat.Settings.music_channel) > 0 then
         DeboCore.Debug("COMBAT", "Parando música de combate")
-        if StopSound then
-            StopSound(Combat.Settings.music_channel)
-        end
+        
+        -- Fazer fade out suave usando SoundUtils antes de parar
+        SoundUtils.FadeOut(Combat.Settings.music_channel, Combat.Settings.combat_volume, -40, 2.0, 30)
     end
 end
 
@@ -285,7 +305,10 @@ function Combat.Commands()
         ["combat debug"] = Combat.ToggleDebug,
         ["combat status"] = Combat.ShowStatus,
         ["combat reset"] = Combat.ResetStats,
-        ["combat test"] = Combat.TestSound
+        ["combat test"] = Combat.TestSound,
+        ["combat music test"] = Combat.TestMusic,
+        ["combat music stop"] = Combat.ForceStopBattleMusic,
+        ["combat music status"] = Combat.ShowMusicStatus
     }
 end
 
@@ -328,6 +351,63 @@ end
 function Combat.TestSound()
     DeboCore.Info("COMBAT", "Testando som de ataque TYPE_HIT...")
     Combat.PlayAttackSound("TYPE_HIT")
+end
+
+function Combat.TestMusic()
+    DeboCore.Info("COMBAT", "Testando música de combate...")
+    Combat.StartBattleMusic()
+end
+
+-- Função para parar imediatamente toda música de combate
+function Combat.ForceStopBattleMusic()
+    DeboCore.Debug("COMBAT", "Parando música de combate imediatamente")
+    
+    -- Parar qualquer fade em andamento
+    SoundUtils.StopFade(Combat.Settings.music_channel)
+    
+    -- Parar o som imediatamente
+    if StopSound then
+        StopSound(Combat.Settings.music_channel)
+    end
+end
+
+-- Função para ajustar volume da música durante combate
+function Combat.SetBattleMusicVolume(volume)
+    if GetSoundStatus and GetSoundStatus(Combat.Settings.music_channel) > 0 then
+        DeboCore.Debug("COMBAT", "Ajustando volume da música para: " .. volume)
+        Combat.Settings.combat_volume = volume
+        
+        if PlaySound then
+            PlaySound(Combat.Settings.music_channel, "", true, volume)
+        end
+    end
+end
+
+-- Função para verificar se música de combate está tocando
+function Combat.IsBattleMusicPlaying()
+    if GetSoundStatus then
+        return GetSoundStatus(Combat.Settings.music_channel) > 0
+    end
+    return false
+end
+
+-- Função para mostrar status da música
+function Combat.ShowMusicStatus()
+    local music_enabled = DeboCore.Settings.music_enabled and "ativada" or "desativada"
+    local music_playing = Combat.IsBattleMusicPlaying() and "tocando" or "parada"
+    local is_fading = SoundUtils.IsFading(Combat.Settings.music_channel) and "em fade" or "sem fade"
+    
+    DeboCore.Info("COMBAT", "=== STATUS DA MÚSICA ===")
+    DeboCore.Info("COMBAT", "Música: " .. music_enabled)
+    DeboCore.Info("COMBAT", "Estado: " .. music_playing)
+    DeboCore.Info("COMBAT", "Fade: " .. is_fading)
+    DeboCore.Info("COMBAT", "Canal: " .. Combat.Settings.music_channel)
+    DeboCore.Info("COMBAT", "Volume: " .. Combat.Settings.combat_volume .. " dB")
+    
+    if GetSoundStatus then
+        local status = GetSoundStatus(Combat.Settings.music_channel)
+        DeboCore.Info("COMBAT", "Status do buffer: " .. status)
+    end
 end
 
 return Combat
