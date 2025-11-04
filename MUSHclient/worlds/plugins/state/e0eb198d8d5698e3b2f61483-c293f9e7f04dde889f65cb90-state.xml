@@ -4,7 +4,7 @@
 <!-- Written by Nick Gammon -->
 <!-- Home Page: http://www.mushclient.com/ -->
 
-<!-- Plugin state saved. Plugin: "Aardwolf_Main_Layout". World: "DeboTeste". -->
+<!-- Plugin state saved. Plugin: "Aardwolf_Main_Layout". World: "DevilsBob". -->
 
 <muclient>
 
@@ -18,9 +18,9 @@
   <variable name="enabled">true</variable>
   <variable name="hide_main_scroll">true</variable>
   <variable name="scrollbar_hidden_once">true</variable>
-  <variable name="trbottom">842</variable>
-  <variable name="trleft">529</variable>
-  <variable name="trright">1378</variable>
-  <variable name="trtop">219</variable>
+  <variable name="trbottom">585</variable>
+  <variable name="trleft">360</variable>
+  <variable name="trright">1150</variable>
+  <variable name="trtop">32</variable>
 </variables>
 </muclient>

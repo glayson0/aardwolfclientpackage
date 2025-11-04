@@ -1,0 +1,100 @@
+<aliases>
+  <alias
+    match="inv"
+    enabled="y"
+    send_to="12"
+    sequence="100"
+  >
+    <send>
+
+      require "wait"
+      require "movewindow"  -- carrega o módulo movewindow
+
+      wait.make (function () -- coroutine starts here
+
+      local win = GetPluginID () .. ":inventory"
+      local font = "f"
+
+      if not WindowInfo (win, 1) then
+        WindowCreate (win, 0, 0, 0, 0, 6, 0, 0)
+        WindowFont (win, font, "Lucida Console", 9)
+      end -- if
+
+      -- request inventory
+      Send "inventory"
+
+      -- wait for inventory to start
+      local x = wait.match ("You are carrying:", 10)
+
+      if not x then
+        ColourNote ("white", "blue", "No inventory received within 10 seconds")
+        return
+      end -- if
+
+      local inv = {}
+      local max_width = WindowTextWidth (win, font, "Inventory")
+
+      -- loop until end of inventory
+      while true do
+        local line, wildcards, styles = wait.match ("*")
+
+        -- see if end of inventory
+        if not string.match (line, "^ ") then
+          break
+        end -- if
+
+        -- save inventory line
+        table.insert (inv, styles)
+        -- work out max width
+        max_width = math.max (max_width, WindowTextWidth (win, font, line))
+      end -- while loop
+
+      local font_height = WindowFontInfo (win, font, 1)
+      local window_width = max_width + 10
+      local window_height = font_height * (#inv + 2) + 10
+
+      -- instalar o handler de movimento da janela
+      local windowinfo = movewindow.install (win, 
+        miniwin.pos_center_all, 
+        miniwin.create_absolute_location, 
+        true)
+
+      -- make window correct size
+      WindowCreate (win, 
+        windowinfo.window_left, 
+        windowinfo.window_top, 
+        window_width, 
+        window_height, 
+        windowinfo.window_mode, 
+        windowinfo.window_flags, 
+        ColourNameToRGB "#373737")
+
+      WindowRectOp (win, 5, 0, 0, 0, 0, 5, 15 + 0x1000)
+
+      -- adicionar o drag handler para toda a barra de título (altura do cabeçalho)
+      local title_height = font_height + 10
+      movewindow.add_drag_handler (win, 0, 0, 0, title_height)
+
+      -- heading line
+      WindowText (win, font, "Inventory", 5, 5, 0, 0, ColourNameToRGB "yellow")
+
+      -- draw each inventory line
+      local y = font_height * 2 + 5
+
+      for i, styles in ipairs (inv) do
+        local x = 5
+        for _, style in ipairs (styles) do
+          x = x + WindowText (win, font, style.text, x, y, 0, 0, style.textcolour)
+        end -- for
+        y = y + font_height
+      end -- for each inventory item
+
+      -- salvar estado da janela
+      movewindow.save_state (win)
+      WindowShow (win, true)
+
+      end) -- end of coroutine
+
+    </send>
+  </alias>
+</aliases>
